@@ -359,37 +359,51 @@ configure_cors()
 
     local api_id=$1
     local update_api_check
+    local current_cors_config
 
-    cat > cors_config.json <<EOF
+    current_cors_config=$(aws apigatewayv2 get-api \
+                          --api-id "$api_id" \
+                          --query "CorsConfiguration" \
+                          --output json)
+
+    if [ "$current_cors_config" != "null" ] && echo "$current_cors_config" | grep -Fq "*" ; then
+        
+        log "CORS is ALREADY configured properly. Skipping Update."
+
+    else
+
+        cat > cors_config.json <<EOF
 {
-  "AllowOrigins": ["*"],
-  "AllowHeaders": ["Content-Type" ,"Authorization"],
-  "AllowMethods": ["POST" ,"OPTIONS"],
-  "AllowCredentials": false,
-  "MaxAge": 300
+"AllowOrigins": ["*"],
+"AllowHeaders": ["Content-Type", "Authorization"],
+"AllowMethods": ["POST", "GET", "OPTIONS"],
+"MaxAge": 300
 }
 EOF
 
-    update_api_check=$(aws apigatewayv2 update-api --api-id "$api_id" \
-                       --cors-configuration file://cors_config.json \
-                       --query "ApiId" \
-                       --output text)
-    
-    rm cors_config.json
-    
-    if [ "$update_api_check" == "" ] || [ "$update_api_check" == "None" ]; then
+        update_api_check=$(aws apigatewayv2 update-api --api-id "$api_id" \
+                        --cors-configuration file://cors_config.json \
+                        --query "ApiId" \
+                        --output text)
+        
+        rm cors_config.json
+        
+        if [ "$update_api_check" == "" ] || [ "$update_api_check" == "None" ]; then
 
-        err "Error in Configuring CORS."
-        exit 1 
+            err "Error in Configuring CORS."
+            exit 1 
+
+        fi
+
+        log "Successfully Configurung CORS."
 
     fi
-
-    log "Successfully Configurung CORS."
-
+    
 }
 
 
 API_NAME="test-http-api"
+ROUTES_KEYS=("POST /solve/bfs" "POST /solve/dfs" "POST /solve/astar")
 TARGET_API_ID=$(create_api "$API_NAME")
 create_default_stage "$TARGET_API_ID"
 configure_cors "$TARGET_API_ID"
@@ -414,19 +428,18 @@ for route_key in "${!ROUTE_MAP[@]}"; do
     
     LAMBDA_NAME="${ROUTE_MAP[$route_key]}"
     
-    log "------------------------------------------------"
     log "Processing: $route_key -> Lambda: $LAMBDA_NAME"
     
     INTEGRATION_ID=$(add_api_lambda_integration "$TARGET_API_ID" "$LAMBDA_NAME")
     
     attach_route_with_lambda "$TARGET_API_ID" "$route_key" "$INTEGRATION_ID"
     
-    CURRENT_SOURCE_ARN="arn:aws:execute-api:$REGION:$ACCOUNT_ID:$TARGET_API_ID/*/*$route_key" 
+    ROUTE_PATH_ONLY="${route_key#* }"
+
+    CURRENT_SOURCE_ARN="arn:aws:execute-api:$REGION:$ACCOUNT_ID:$TARGET_API_ID/*/*$ROUTE_PATH_ONLY" 
     
     add_api_lambada_permission_safe "$LAMBDA_NAME" "$CURRENT_SOURCE_ARN"
 
 done
 
-log "------------------------------------------------"
 log "All Done! Your API is ready."
-

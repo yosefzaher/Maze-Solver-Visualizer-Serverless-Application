@@ -9,15 +9,15 @@ set -o pipefail
 ROLE_ARN=$(bash IAM.sh)
 
 LAMBDA_NAMES=("bfs-function" "dfs-function" "astar-function")
-LAMBDA_ZIP_PATHS=("fileb://./Lambda Functions/zip_files/bfs_function.zip" \
-                  "fileb://./Lambda Functions/zip_files/dfs_function.zip" \
-                  "fileb://./Lambda Functions/zip_files/astar_function.zip")
+LAMBDA_ZIP_PATHS=("fileb://../Lambda Functions/zip_files/bfs_function.zip" \
+                  "fileb://../Lambda Functions/zip_files/dfs_function.zip" \
+                  "fileb://../Lambda Functions/zip_files/astar_function.zip")
 LAMBDA_FILE_NAMES=("bfs_lambda" "dfs_lambda" "astar_lambda")
 
 LAMBDA_FUNCTION_NAME="lambda_handler"
 LAMBDA_RUNTIME="python3.14"
 
-LAMBDA_LAYER_ZIP_PATH="fileb://./AWS Lambda Layer/python.zip"
+LAMBDA_LAYER_ZIP_PATH="fileb://../AWS Lambda Layer/python.zip"
 LAMBDA_LAYER_NAME="maze-helper-functions-layer"
 LAMBDA_LAYER_DESCRIPTION="A Layer with the Helper Shared Library for Lambda Functions"
 LAMBDA_LAYER_ARCHITECTURE="x86_64"

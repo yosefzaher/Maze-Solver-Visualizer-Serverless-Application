@@ -18,7 +18,7 @@ LAMBDA_FUNCTION_NAME="lambda_handler"
 LAMBDA_RUNTIME="python3.14"
 
 LAMBDA_LAYER_ZIP_PATH="fileb://../AWS Lambda Layer/python.zip"
-LAMBDA_LAYER_NAME="maze-helper-functions-layer"
+LAMBDA_LAYER_NAME="mazesolver-helper-functions-layer"
 LAMBDA_LAYER_DESCRIPTION="A Layer with the Helper Shared Library for Lambda Functions"
 LAMBDA_LAYER_ARCHITECTURE="x86_64"
 
@@ -88,6 +88,8 @@ create_lambda_function()
                                 --role "$role_arn" \
                                 --handler "$lambda_file_name"."$lambda_function_name" \
                                 --zip-file "$lambda_zip_path")
+
+        aws lambda wait function-active --function-name "$lambda_name"
         
         lambda_function_arn=$(echo "$creating_function_result" | grep -oP '(?<="FunctionArn": ")[^"]*' || true)
         

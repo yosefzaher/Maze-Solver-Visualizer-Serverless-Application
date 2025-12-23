@@ -126,11 +126,10 @@ attach_policy()
 }
 
 
-lambda_iam_role_arn=$(create_role "$ROLE_NAME" "$TRUST_POLICY_PATH")
+create_role "$ROLE_NAME" "$TRUST_POLICY_PATH"
 
 attach_policy "$LAMBDA_POLICY_ARN" "$ROLE_NAME"
 
 log "All Done !"
 
-echo "$lambda_iam_role_arn"
 

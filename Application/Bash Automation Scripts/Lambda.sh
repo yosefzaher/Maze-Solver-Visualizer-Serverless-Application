@@ -6,7 +6,7 @@ set -e
 # Exit if Any Command in a Pipes Fail (Important for aws ... | jq -r)
 set -o pipefail
 
-ROLE_ARN=$(bash IAM.sh)
+ROLE_NAME="lambda-maze-role"
 
 LAMBDA_NAMES=("bfs-function" "dfs-function" "astar-function")
 LAMBDA_ZIP_PATHS=("fileb://../Lambda Functions/zip_files/bfs_function.zip" \
@@ -33,6 +33,29 @@ log()
 {
     # $1 is the Log Message
     echo "[INFO] $1" >&2
+}
+
+get_role_arn()
+{
+    # $1 is the Role Name
+
+    local role_name=$1
+
+    iam_role_arn=$(aws iam list-roles \
+                       --query "Roles[?RoleName == '$role_name'].Arn" \
+                       --output text)
+
+    if [ "$iam_role_arn" == "" ] || [ "$iam_role_arn" == "None" ]; then
+    
+        err "Error in Getting The Lambda Role ARN."
+        exit 1
+    
+    fi
+
+    log "Lambda Role ARN is : $iam_role_arn"
+
+    echo "$iam_role_arn"
+
 }
 
 create_lambda_function()
@@ -205,6 +228,8 @@ create_lambda_layer "$LAMBDA_LAYER_NAME" "$LAMBDA_LAYER_DESCRIPTION" "$LAMBDA_LA
                     "$LAMBDA_RUNTIME" "$LAMBDA_LAYER_ARCHITECTURE"
 
 LAMBDA_LAYER_ARN=$(get_latest_layer_version "$LAMBDA_LAYER_NAME")
+
+ROLE_ARN=$(get_role_arn "$ROLE_NAME")
 
 for i in "${!LAMBDA_NAMES[@]}"; do
     

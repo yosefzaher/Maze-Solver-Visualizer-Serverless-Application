@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Exit Immediately if Any Command Exists With Non-Zero Status
+set -e 
+
+
+# Exit if Any Command in a Pipes Fail (Important for aws ... | jq -r)
+set -o pipefail
+
 BUCKET_NAME="maze-solver-s3-bucket"
 REGION="us-east-1"
 INDEX_DOCUMENT="index.html"

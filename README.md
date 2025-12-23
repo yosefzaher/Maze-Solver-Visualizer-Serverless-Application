@@ -137,6 +137,8 @@ You can deploy the entire infrastructure to your own AWS account using the provi
     ```
     *This script automates the creation of IAM Roles, Lambda Functions, API Gateway, S3 Buckets, and CloudFront Distributions.*
 
+    ![Automated Deployment Demo](Automation.gif)
+
 ### Live Demo
 The application frontend is deployed and available live at:
 **[zaher.online](https://zaher.online)** _(Replace with actual URL if different)_

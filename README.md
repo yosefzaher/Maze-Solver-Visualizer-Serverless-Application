@@ -65,6 +65,9 @@ The application follows a modern serverless microservices pattern:
 Serverless Graph Search Visualizer/
 ├── Application/
 │   ├── AWS Lambda Layer/       # Shared Python modules (Helper functions)
+│   ├── Bash Automation Scripts/ # Infrastructure-as-Code Automation
+│   │   ├── main.sh             # Master deployment script
+│   │   └── ...                 # Individual resource scripts (IAM, Lambda, S3, etc.)
 │   ├── Lambda Functions/
 │   │   ├── bfs_solver.py       # Breadth-First Search logic
 │   │   ├── dfs_solver.py       # Depth-First Search logic
@@ -114,7 +117,25 @@ Solves the maze using the specified algorithm.
 
 ---
 
-## 🚀 How to Run
+## 🚀 Deployment & Usage
+
+### ☁️ Automated Deployment
+You can deploy the entire infrastructure to your own AWS account using the provided Bash and AWS CLI scripts.
+
+**Prerequisites:**
+- **AWS CLI** installed and configured (`aws configure`).
+- **Bash** shell (Linux, macOS, or WSL).
+
+**Deployment Steps:**
+1.  Navigate to the scripts directory:
+    ```bash
+    cd "Application/Bash Automation Scripts"
+    ```
+2.  Run the master deployment script:
+    ```bash
+    bash main.sh
+    ```
+    *This script automates the creation of IAM Roles, Lambda Functions, API Gateway, S3 Buckets, and CloudFront Distributions.*
 
 ### Live Demo
 The application frontend is deployed and available live at:

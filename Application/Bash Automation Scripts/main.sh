@@ -4,5 +4,6 @@ bash IAM.sh
 bash Lambda.sh
 bash APIGateway.sh
 bash S3.sh
+bash ACM.sh
 bash CloudFront.sh
 bash Route53.sh
